@@ -436,3 +436,14 @@ body.live{gap:0}
   #toast{bottom:calc(150px + env(safe-area-inset-bottom))}
 }
 input,textarea,select{font-size:16px}
+/* scroll: niente padding in fondo al contenitore, c'è lo spaziatore .vpad */
+#view,#view.nav-on,#view.cta-nav{padding-bottom:0!important}
+.vpad{flex:none;width:100%;height:150px}
+#view{-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#view .car,#view .gal,#view .tabs,#view .who{touch-action:pan-x pan-y}
+@media (max-width:500px){
+  .vpad{padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box}
+  /* la pagina esterna non scorre: il dito muove solo il contenuto dell'app */
+  html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
+  .ph{height:100%;height:100dvh}
+}

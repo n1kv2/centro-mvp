@@ -44,6 +44,14 @@
   };
   window.App = App;
 
+  /* altezza dello spaziatore = pulsanti fissi + barra bassa + margine; segue i cambi di altezza dei pulsanti */
+  function fitPad() {
+    const p = document.getElementById('vpad'); if (!p) return;
+    const ch = $('#cta').offsetHeight, nav = $('#phone').classList.contains('has-nav') ? $('#nav').offsetHeight + 24 : 0;
+    p.style.height = Math.max(ch + nav + 16, nav ? nav + 40 : 40) + 'px';
+  }
+  if (window.ResizeObserver) new ResizeObserver(fitPad).observe(document.getElementById('cta'));
+
   /* ricorda dove eri nella schermata che lasci, per tornarci con «Indietro» */
   function saveScroll() { const c = App.current; if (c) c.scroll = $('#view').scrollTop; }
 
@@ -85,16 +93,15 @@
     if (typeof out === 'string') out = { html: out };
     const v = $('#view'), st = keepScroll ? v.scrollTop : dir < 0 ? (c.scroll || 0) : 0;
     v.className = (sc.nav ? 'nav-on' : '') + (out.hero ? ' has-hero' : '') + (out.cls ? ' ' + out.cls : '');
-    v.innerHTML = (out.hero || '') + `<div class="cn"${out.cnStyle ? ` style="${out.cnStyle}"` : ''}>${out.html}</div>`;
-    v.scrollTop = st; $('#phone').classList.toggle('scrolled', st > 12);
-    if (!keepScroll && dir) { v.classList.add(dir > 0 ? 'enter' : 'enter-back'); }
+    /* in fondo uno spaziatore vero (non padding: Safari su iPhone non lo conta nello scroll) */
+    v.innerHTML = (out.hero || '') + `<div class="cn"${out.cnStyle ? ` style="${out.cnStyle}"` : ''}>${out.html}</div><div class="vpad" id="vpad"></div>`;
     $('#top').innerHTML = topHtml(sc, c.p);
     $('#cta').innerHTML = out.cta ? `<div class="ctab">${out.cta}</div>` : '';
     $('#nav').innerHTML = sc.nav ? navHtml(sc) : '';
     $('#phone').classList.toggle('has-nav', !!sc.nav);
-    /* lo spazio in fondo segue l'altezza reale dei pulsanti fissi, così nulla resta coperto */
-    const ch = $('#cta').offsetHeight;
-    v.style.paddingBottom = ch ? (ch + (sc.nav ? 96 : 0) + 16) + 'px' : '';
+    fitPad();
+    v.scrollTop = st; $('#phone').classList.toggle('scrolled', st > 12);
+    if (!keepScroll && dir) { v.classList.add(dir > 0 ? 'enter' : 'enter-back'); }
     $('#nvf').innerHTML = sc.nav ? ' ' : '';
     if (!keepScroll) App.closeOv();
     if (sc.mount) sc.mount(v, c.p, c);

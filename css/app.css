@@ -447,3 +447,12 @@ input,textarea,select{font-size:16px}
   html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
   .ph{height:100%;height:100dvh}
 }
+/* tocchi: gli strati decorativi sopra il contenuto non devono intercettarli (sfumatura sopra la barra, fondo dei pulsanti fissi, barra alta) */
+#nvf,#tfade{pointer-events:none!important}
+#cta,#cta .ctab,#top{pointer-events:none}
+#cta .ctab>*,#cta .ctab .btn,#cta .ctab input,#cta .ctab button,#cta .ctab .ratebox *,#top>*{pointer-events:auto}
+#cta .ctab>div[style*="display:flex"]{pointer-events:none}
+#cta .ctab>div[style*="display:flex"]>*{pointer-events:auto}
+/* niente ritardo né doppio tocco-zoom sui controlli */
+.btn,.chip,.gl,.nv,.card.tap,.opt2,.sc5>div,.lik button,.tpill,.whoi,.bub,.trow,.fhit,[data-act],[data-go],[data-tab],[data-back]{touch-action:manipulation}
+#view{touch-action:auto}

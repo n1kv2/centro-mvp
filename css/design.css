@@ -117,3 +117,36 @@
 .dline{display:flex;gap:6px;flex-wrap:wrap}
 .dline i{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px 'DM Sans';color:#fff;font-style:normal}
 .dline i.q{background:#fff;color:#123F73;border:2px solid #123F73;box-sizing:border-box}
+/* freccia delle sezioni: triangolo pieno come nel design (grigio · blu aperta · verde completata) */
+.sx-c .tri{display:block;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:8px solid #CCD2D9;border-radius:2px;margin-right:4px}
+.sx.open .sx-c .tri{border-top-color:#489DFE}
+.sx.done .sx-c .tri{border-top-color:#6ABD3D}
+/* sezione completata come nel design: cerchio verde chiaro con spunta, sottotitolo grigio */
+.sx.done .sx-i{background:#E6F9DA!important}
+.sx.done .sx-i svg{stroke:#6ABD3D!important}
+.sx.done .sx-i:after{display:none}
+.sx.done .sx-t span{color:#7B7B7C!important}
+/* copertina: pulsanti traslucidi, testo nero */
+.cover-act .gl{color:#000!important;background:rgba(255,255,255,.5)!important;backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.65);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.cover-act .gl svg{stroke:#000!important}
+/* testo di Nia e «A mano»: stessa misura */
+.nbox,.nbox.desc{font:400 17px/22px 'DM Sans'!important}
+.nbox::placeholder{font-style:italic}
+/* notifiche impilate */
+.notif{padding:16px!important;gap:10px}
+.notif .sx-i{width:42px;height:42px}
+.nmeta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.ndot{width:9px;height:9px;border-radius:50%;background:#489DFE;display:block}
+.nstack{position:relative;padding-bottom:16px;cursor:pointer;flex:none;width:100%}
+.nstack .top{position:relative;z-index:2}
+.nstack .ghost{position:absolute;left:14px;right:14px;bottom:8px;height:60px;background:#fff;border-radius:35px;box-shadow:0 0 8px rgba(102,173,255,.12);z-index:1;opacity:.9}
+.nstack .ghost.g2{left:28px;right:28px;bottom:0;z-index:0;opacity:.6}
+.nstack:active .top{transform:scale(.99)}
+.ngroup{display:flex;flex-direction:column;gap:10px;width:100%;flex:none}
+.ngh{justify-content:space-between;padding:0 4px}
+.nin{animation:nin .3s cubic-bezier(.2,.8,.2,1) backwards}
+.ngroup .nin:nth-child(3){animation-delay:.05s}.ngroup .nin:nth-child(4){animation-delay:.1s}.ngroup .nin:nth-child(5){animation-delay:.15s}
+@keyframes nin{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
+.nstack{padding-bottom:20px}
+.nstack .ghost{background:#F9FBFF;border:1px solid #E6EDF7;box-shadow:0 2px 10px rgba(102,173,255,.14);opacity:1;bottom:10px}
+.nstack .ghost.g2{background:#F2F6FC;bottom:0}

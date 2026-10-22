@@ -110,8 +110,8 @@
       return {
         hero: `<div class="cover${d.photo ? ' has-img' : ''}" style="${bg}"></div>
           <div class="cover-tags"><span class="pl">Passo 1 di 4</span></div>
-          <div class="cover-act"><label class="gl">${ic('camera', { size: 18, color: '#C2541B' })}Modifica copertina<input type="file" accept="image/*" id="coverIn" hidden></label>
-            <span class="gl sq" data-act="niaCover" aria-label="Copertina suggerita da Nia">${ic('sparkle', { size: 18, color: '#C2541B' })}</span></div>`,
+          <div class="cover-act"><label class="gl">${ic('camera', { size: 18, color: '#000' })}Modifica copertina<input type="file" accept="image/*" id="coverIn" hidden></label>
+            <span class="gl sq" data-act="niaCover" aria-label="Copertina suggerita da Nia">${ic('sparkle', { size: 18, color: '#000' })}</span></div>`,
         cls: 'cover-on',
         html: `<div class="title-card" data-f="title"><input class="title-in" id="title" placeholder="Titolo dell'attività" maxlength="48" value="${esc(d.title || '')}" aria-label="Titolo"></div>
           ${Sec.card({ id: 'cat', icon: 'grid', title: 'Categoria', sub: d.interest || 'Scegli il tema della tua attività', done: !!d.interest, open: !d.interest,

@@ -43,7 +43,7 @@
     fragments() { return DATA.tasks.filter(t => S.tasks[t.id]).length; },
     progress() { return Math.round(this.fragments() / DATA.tasks.length * 100); },
     unread() { return S.notifs.filter(n => !n.read).length; },
-    notify(n) { S.notifs.unshift(Object.assign({ id: 'n' + Date.now(), at: 'ora', read: false }, n)); this.save(); },
+    notify(n) { const d = new Date(); S.notifs.unshift(Object.assign({ id: 'n' + Date.now(), ts: Date.now(), at: d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'), read: false }, n)); this.save(); },
 
     /* ---- questionario ---- */
     allQs() { return DATA.blocks.flatMap(b => b.qs.map(q => Object.assign({ blk: b.id }, q))); },

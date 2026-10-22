@@ -70,7 +70,10 @@ DATA.demoNotifs = [
   { t: 'Anna ha accettato la tua richiesta', s: 'Corsa al parco · Sab 14 · 10:00', at: '9:12', kind: 'accept', read: false },
   { t: 'Nuove attività community di oggi', s: '3 nuove · email giornaliera', at: '8:00', kind: 'mail', read: false },
   { t: 'Luca ha chiesto di partecipare', s: 'Corsa al parco', at: 'ieri', kind: 'request', read: true },
-  { t: 'Valuta «Gita al lago»', s: 'Fallo ora e ottieni punti', at: 'ieri', kind: 'rate', read: true }
+  { t: 'Valuta «Gita al lago»', s: 'Fallo ora e ottieni punti', at: 'ieri', kind: 'rate', read: true },
+  { t: 'Nuovo messaggio in «Gita al lago»', s: 'Chiara: treno delle 8:43 da Cadorna!', at: '10:05', kind: 'chat', ref: 'c3', read: false },
+  { t: 'Sara ha chiesto di partecipare', s: 'Corsa al parco', at: 'ieri', kind: 'request', read: true },
+  { t: 'Task completato: valuta i risultati Affini', s: '+40 punti · nuovo pezzo del biglietto', at: 'ieri', kind: 'tasks', read: true }
 ];
 DATA.demoRatings = [
   { id: 'c1', title: 'Corsa al parco', kind: 'Community', v: 4 },

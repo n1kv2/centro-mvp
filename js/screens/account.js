@@ -301,23 +301,51 @@
 
   /* ---------- 1h · Centro notifiche ---------- */
   const NGO = { accept: ['myActs', 'Apri attività'], request: ['myActs', 'Vedi richiesta'], rate: ['myActs', 'Valuta ora'], mail: ['mail', 'Leggi email'], tasks: ['tasks', 'Vai ai task'] };
+  /* raggruppate per giorno e per area; le aree con più notifiche sono impilate e si aprono al tocco */
+  const AREA = { accept: ['Attività', 'calendar'], request: ['Attività', 'calendar'], chat: ['Attività', 'chat'], tasks: ['Task e punti', 'trophy'], mail: ['Email giornaliera', 'mail'], rate: ['Valutazioni', 'star'] };
+  const areaOf = n => AREA[n.kind] || ['Avvisi', 'bell'];
+  const tsOf = n => {
+    if (n.ts) return n.ts;
+    const d = new Date(), m = (n.at || '').match(/^(\d{1,2}):(\d{2})$/);
+    if (n.at === 'ieri') { d.setDate(d.getDate() - 1); d.setHours(18, 0, 0, 0); return +d; }
+    if (m) { d.setHours(+m[1], +m[2], 0, 0); return +d; }
+    return Date.now();
+  };
+  const dayLabel = ts => { const d = new Date(ts), t = new Date(); t.setHours(0, 0, 0, 0); const diff = Math.round((new Date(d).setHours(0, 0, 0, 0) - t) / 864e5);
+    return diff === 0 ? 'Oggi' : diff === -1 ? 'Ieri' : d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }); };
+  const nCard = (n, cls) => `<div class="card tap notif${n.read ? '' : ' new'}${cls || ''}" data-act="open" data-id="${n.id}">
+      <div class="rw"><div class="sx-i" style="background:${n.read ? '#F5F5F7' : '#E4F1FF'}">${ic(areaOf(n)[1], { color: n.read ? '#000' : '#489DFE' })}</div>
+        <div class="tx"><div class="h3">${esc(n.t)}</div><div class="b15">${esc(n.s)}</div></div>
+        <div class="nmeta">${n.read ? '' : '<i class="ndot"></i>'}<span class="b13">${n.at === 'ieri' ? '' : esc(n.at || '')}</span></div></div>
+      ${!n.read && n.kind === 'accept' ? `<div style="display:flex;gap:8px"><div class="btn" style="flex:1;height:44px" data-act="open" data-id="${n.id}">Apri attività</div><div class="btn s" style="flex:1;height:44px" data-act="open" data-id="${n.id}" data-to="chat">Chat</div></div>` : ''}</div>`;
   App.screen('notifs', {
     top: 'main', nav: true, tab: 'profile',
-    render() {
-      const ns = S().notifs;
+    render(p) {
+      const ns = S().notifs.slice().sort((a, b) => tsOf(b) - tsOf(a)), exp = p._exp || [];
+      if (!ns.length) return `<div class="h1">Notifiche</div><div class="card" style="align-items:center;text-align:center;padding:26px"><div class="ico b">${ic('bell', { color: '#489DFE' })}</div><div class="h3">Nessuna notifica</div></div>`;
+      const days = [];
+      ns.forEach(n => { const dl = dayLabel(tsOf(n)); let d = days.find(x => x.l === dl); if (!d) days.push(d = { l: dl, g: [] }); const a = areaOf(n)[0]; let g = d.g.find(x => x.a === a); if (!g) d.g.push(g = { a, items: [] }); g.items.push(n); });
       return `<div class="rw" style="justify-content:space-between"><div class="h1">Notifiche</div>${Store.unread() ? '<button class="link" data-act="allRead">Segna tutte lette</button>' : ''}</div>
-        ${ns.length ? ns.map(n => `<div class="card tap notif${n.read ? '' : ' new'}" style="padding:16px" data-act="open" data-id="${n.id}">
-          <div class="rw"><div class="tx"><div class="h3">${esc(n.t)}</div><div class="b15">${esc(n.s)}</div></div>${n.read ? `<span class="b13">${n.at}</span>` : '<span class="pl bl">Nuova</span>'}</div>
-          ${!n.read && n.kind === 'accept' ? `<div style="display:flex;gap:8px"><div class="btn" style="flex:1;height:44px" data-act="open" data-id="${n.id}">Apri attività</div><div class="btn s" style="flex:1;height:44px" data-act="open" data-id="${n.id}" data-to="chat">Chat</div></div>` : ''}</div>`).join('')
-          : `<div class="card" style="align-items:center;text-align:center;padding:26px"><div class="ico b">${ic('bell', { color: '#489DFE' })}</div><div class="h3">Nessuna notifica</div></div>`}`;
+        ${days.map(d => `<div class="lab">${d.l}</div>${d.g.map(g => {
+          const key = d.l + '|' + g.a, un = g.items.filter(n => !n.read).length;
+          if (g.items.length === 1) return nCard(g.items[0]);
+          if (exp.includes(key)) return `<div class="ngroup open"><div class="rw ngh"><div class="h3" style="font-size:15px">${g.a} · ${g.items.length}</div><button class="link" data-act="nexp" data-k="${esc(key)}">Mostra meno</button></div>
+            ${g.items.map(n => nCard(n, ' nin')).join('')}</div>`;
+          return `<div class="nstack" data-act="nexp" data-k="${esc(key)}" role="button" aria-label="Apri ${g.a}">
+            ${g.items.length > 2 ? '<i class="ghost g2"></i>' : ''}<i class="ghost g1"></i>
+            <div class="card notif top${un ? ' new' : ''}"><div class="rw"><div class="sx-i" style="background:${un ? '#E4F1FF' : '#F5F5F7'}">${ic(areaOf(g.items[0])[1], { color: un ? '#489DFE' : '#000' })}</div>
+              <div class="tx"><div class="b13">${g.a.toUpperCase()}</div><div class="h3">${esc(g.items[0].t)}</div><div class="b15">${g.items.length - 1 === 1 ? '+ 1 altra' : `+ altre ${g.items.length - 1}`} · tocca per vederle</div></div>
+              <span class="pl ${un ? 'bl' : 'gr'}">${un ? un + ' nuov' + (un > 1 ? 'e' : 'a') : g.items.length}</span></div></div></div>`;
+        }).join('')}`).join('')}`;
     },
     actions: {
+      nexp(el) { const p = App.current.p, k = el.dataset.k; p._exp = p._exp || []; const i = p._exp.indexOf(k); if (i >= 0) p._exp.splice(i, 1); else p._exp.push(k); App.refresh(); },
       open(el, e) {
         e.stopPropagation();
         const n = S().notifs.find(x => x.id === el.dataset.id); if (!n) return;
         n.read = true; Store.save();
-        if (n.ref) return App.go(el.dataset.to === 'chat' ? 'chat' : 'partHub', { id: n.ref });
-        App.go(el.dataset.to || (NGO[n.kind] || ['tasks'])[0], el.dataset.to === 'chat' ? { id: 'c3' } : n.kind === 'accept' ? {} : {});
+        if (n.ref) return App.go(el.dataset.to === 'chat' || n.kind === 'chat' ? 'chat' : 'partHub', { id: n.ref });
+        App.go(el.dataset.to || (NGO[n.kind] || ['tasks'])[0], el.dataset.to === 'chat' ? { id: 'c3' } : {});
       },
       allRead() { S().notifs.forEach(n => n.read = true); Store.save(); App.refresh(); }
     }

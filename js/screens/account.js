@@ -331,7 +331,7 @@
         <div style="padding:16px;border-bottom:1px solid #E3E3EA;display:flex;flex-direction:column;gap:4px"><div class="b13">Da: Nia Test · A: ${esc(S().user.email || 'tu@email.it')}</div><div class="b13">${today} · 8:00</div><div class="h2">Le nuove attività di oggi</div></div>
         <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
           <div class="b17">Ciao ${esc(S().user.nome || '')}, ecco tutte le attività community pubblicate oggi, a prescindere dall'abbinamento. Controlla: quella che ti piace molto compare nel tuo feed Affini?</div>
-          ${DATA.community.map(a => `<div class="c2 tap" style="flex-direction:row;align-items:center;border-radius:20px" data-go="explore">
+          ${DATA.community.map(a => `<div class="c2 tap" style="flex-direction:row;align-items:center;border-radius:25px" data-go="explore">
             <div class="thumb" style="--h:${a.hue}">${a.interest[0]}</div><div class="tx"><div class="h3">${a.title}</div><div class="b13">Community · ${a.where.split(', ').pop()} · ${a.when}</div></div>${chev()}</div>`).join('')}
           <div class="b13" style="text-align:center">Non vuoi più riceverla? Impostazioni › Notifiche</div></div></div>
         <div class="b13" style="padding:0 6px">Visibile anche nell'area personale sul sito.</div>`;

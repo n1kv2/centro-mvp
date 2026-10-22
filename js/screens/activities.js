@@ -55,32 +55,36 @@
     if (changed) save();
   }
   setInterval(tick, 1000);
-  window.Acts = { tick };
+  window.Acts = { tick, find: id => find(id), members: x => members(x) };
 
   /* ---------- 1g · 1 · Chiedi di partecipare (con amici registrati) ---------- */
   let friends = [];
   const free = x => Math.max(0, (x.max || 6) - members(x).length - 1);    // posti liberi dopo di te
   const friendChips = x => friends.map((f, i) => `<span class="chip sm on" data-act="rmFriend" data-i="${i}">${esc(f.name.split(' ')[0])} ×</span>`).join('');
+  let single = false;
   App.screen('joinReq', {
     top: 'main',
     render(p) {
-      const x = find(p.id); friends = [];
+      const x = find(p.id); friends = []; single = false;
       return {
-        html: `<div class="h1">Chiedi di partecipare</div>
-          <div class="c2"><div class="rw"><div class="thumb big" style="${actCover(x)};--h:${actHue(x.interest)}">${x.photo ? '' : esc(x.title[0])}</div><div class="tx"><div class="h3">${esc(x.title)}</div><div class="b15">${esc(x.when || '')} · ${esc(x.who)}</div></div></div></div>
-          <div class="b17" style="padding:0 4px">Scrivi un breve messaggio a ${esc(x.who)}.</div>
-          <textarea class="inp" id="jmsg" style="height:120px" placeholder="Ciao, mi piacerebbe…" maxlength="240"></textarea>
-          <div class="card" style="gap:10px"><div class="rw"><div class="ico b">${ic('users', { color: '#489DFE' })}</div><div class="tx"><div class="h3">Vieni con qualcuno?</div><div class="b15">Solo chi è registrato al test · ${free(x)} posti liberi</div></div></div>
-            <div id="fchips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-            <div class="inp">${ic('search', { color: '#7B7B7C' })}<input class="bare" id="fq" placeholder="Nome o codice NIA-…" autocomplete="off"></div>
-            <div id="fres" style="display:flex;flex-direction:column;gap:6px"></div></div>
-          <div class="gy" style="background:#E4F1FF"><div class="b15" style="color:#123F73">Prima e dopo l'attività ti chiederemo di valutarla. Riceverai una notifica quando ${esc(x.who)} risponde.</div></div>`,
-        cta: `<div class="btn off" id="jgo" data-act="send">Invia richiesta</div>`
+        html: `<div class="title-card"><span class="chip sm" style="align-self:center">Fase di prenotazione</span>
+            <div class="h1n" style="font-size:26px;line-height:32px">${esc(x.title)}</div><div class="b15">Organizzato da ${esc(x.who)} · ${esc(x.when || '')}</div></div>
+          ${Sec.card({ id: 'target', icon: 'target', title: 'Per chi', sub: 'La community di riferimento',
+            body: `<div class="b15">${esc(x.perChi || 'Tutti, anche chi viene da solo')} · ${esc(x.interest)}${x.intensity ? ' · intensità ' + x.intensity.toLowerCase() : ''}</div>` })}
+          ${Sec.card({ id: 'friends', icon: 'users', title: 'Aggiungi amici', sub: `Chi porti con te? · ${free(x)} posti liberi`, open: true,
+            body: `<div id="fchips" class="fbtags"></div>
+              <div class="inp">${ic('search', { color: '#7B7B7C' })}<input class="bare" id="fq" placeholder="Nome o codice NIA-…" autocomplete="off"></div>
+              <div id="fres" style="display:flex;flex-direction:column;gap:6px"></div>
+              <div id="fsingle"></div>
+              <div class="b13">Solo chi è registrato al test si può aggiungere.</div>` })}
+          ${Sec.card({ id: 'msg', icon: 'chat', title: 'Messaggio per l\'organizzatore', sub: 'Nota facoltativa per ' + esc(x.who),
+            body: `<textarea class="inp" id="jmsg" style="height:110px" placeholder="Ciao, mi piacerebbe…" maxlength="240"></textarea>` })}
+          <div class="sub">${ic('star', { color: '#7B7B7C' })}<div class="b15">Prima e dopo l'attività ti chiederemo di valutarla. Riceverai una notifica quando ${esc(x.who)} risponde.</div></div>`,
+        cta: `<div class="bookbar"><div class="btn" id="jgo" data-act="send">Invia richiesta</div><span class="price">Gratis</span></div>`
       };
     },
     mount(v, p) {
-      const x = find(p.id), t = v.querySelector('#jmsg'), q = v.querySelector('#fq');
-      t.addEventListener('input', () => document.getElementById('jgo').classList.toggle('off', t.value.trim().length < 3));
+      const x = find(p.id), q = v.querySelector('#fq');
       q.addEventListener('input', () => search(x, q.value));
     },
     actions: {
@@ -90,16 +94,20 @@
         friends.push(u); const q = document.getElementById('fq'); q.value = ''; search(x, ''); App.buzz();
       },
       rmFriend(el) { friends.splice(+el.dataset.i, 1); search(find(App.current.p.id), document.getElementById('fq').value); },
+      single(el) { single = !single; el.classList.toggle('on', single); },
       send() {
-        const id = App.current.p.id, m = document.getElementById('jmsg').value.trim(); if (m.length < 3) return;
-        P()[id] = { status: 'pending', msg: m, at: Date.now(), friends: friends.slice() }; save();
+        const id = App.current.p.id, m = document.getElementById('jmsg').value.trim();
+        P()[id] = { status: 'pending', msg: m, at: Date.now(), friends: friends.slice(), single: friends.length ? single : false }; save();
         App.back();                                   // si torna alla locandina dell'attività
-        App.toast(friends.length ? `Richiesta inviata per te e ${friends.length} amic${friends.length > 1 ? 'i' : 'o'}` : 'Richiesta inviata');
+        App.toast(friends.length ? `Richiesta inviata per te e ${friends.length} amic${friends.length > 1 ? 'i' : 'o'}${single ? ' · più quella singola' : ''}` : 'Richiesta inviata');
       }
     }
   });
   function search(x, q) {
     document.getElementById('fchips').innerHTML = friendChips(x);
+    document.getElementById('fsingle').innerHTML = friends.length ? `<div class="sub" style="align-items:flex-start"><div class="tx"><div class="h3" style="font-size:16px">+ Candidatura singola</div>
+      <div class="b15">Verranno inoltrate due richieste: una per l'intero gruppo e una singola, così da consentire anche un'eventuale selezione individuale.</div></div>
+      <button class="toggle${single ? ' on' : ''}" data-act="single" aria-label="Candidatura singola"></button></div>` : '';
     const box = document.getElementById('fres'), s = q.trim().toLowerCase();
     if (s.length < 2) { box.innerHTML = ''; return; }
     const hits = DATA.users.filter(u => !friends.includes(u) && (u.name.toLowerCase().includes(s) || u.code.toLowerCase().includes(s))).slice(0, 4);
@@ -119,7 +127,7 @@
       const arch = Object.entries(P()).filter(([, v]) => v.status === 'archived').map(([id, v]) => ({ x: find(id), v, role: 'Partecipato' })).filter(r => r.x)
         .concat((S().userActs || []).filter(a => a.archived).map(a => ({ x: a, v: { status: 'archived' }, role: 'Organizzato' })));
       const row = (x, pill, go, sub) => `<div class="c2 tap" style="border-radius:25px;padding:12px" data-go="${go}" data-p='{"id":"${x.id}"}'><div class="rw">
-        <div class="thumb" style="width:56px;height:56px;border-radius:16px;${actCover(x)};--h:${actHue(x.interest)}">${x.photo ? '' : esc(x.title[0])}</div>
+        <div class="thumb" style="width:56px;height:56px;border-radius:25px;${actCover(x)};--h:${actHue(x.interest)}">${x.photo ? '' : esc(x.title[0])}</div>
         <div class="tx"><div class="h3">${esc(x.title)}</div><div class="b15">${esc(sub)}</div></div>${pill}</div></div>`;
       const empty = (t, cta, go) => `<div class="card" style="align-items:center;text-align:center;padding:26px 18px"><div class="h3">${t}</div><div class="btn sm" data-go="${go}">${cta}</div></div>`;
       let body;
@@ -153,7 +161,7 @@
           ${hubRow(['chat'], 'Chat del gruppo', un ? `${un} nuovi messaggi` : 'Scrivi ai partecipanti', null, `data-go="chat" data-p='{"id":"${a.id}"}'`)}
           ${hubRow(['user'], 'Partecipanti', `${mem} su ${a.max} posti`, null, `data-go="participants" data-p='{"id":"${a.id}"}'`)}
           ${hubRow(['pencil'], 'Modifica attività', 'Titolo, luogo, posti, descrizione', null, `data-go="actEdit" data-p='{"id":"${a.id}"}'`)}
-          ${hubRow(['check'], 'Chiudi e valuta', 'A fine attività', null, `data-go="finalRate" data-p='{"id":"${a.id}","role":"org"}'`)}`
+          ${hubRow(['check'], 'Chiudi e valuta', 'Valuta i partecipanti e archivia', null, `data-go="orgRate" data-p='{"id":"${a.id}"}'`)}`
       };
     }
   });
@@ -186,7 +194,8 @@
       return {
         html: `<div class="h1">${esc(r.name)}</div>
           <div class="card"><div style="display:flex;flex-direction:column;align-items:center;gap:8px">${av(r.name, 88)}<div class="h2">${esc(r.name)}</div>${p.blind ? `<span class="b13">Richiesta ${ago(r.at)}</span>` : `<span class="pl ${l[0]}">${r.aff == null ? 'Affinità da calcolare: questionario incompleto' : l[1] + ' a questa attività'}</span>`}</div></div>
-          <div class="card"><div class="b15">MESSAGGIO</div><div class="b17" style="color:#000">«${esc(r.msg)}»</div></div>
+          ${Sec.card({ id: 'prof', icon: 'user', title: 'Vedi profilo', sub: 'Affidabilità nelle attività precedenti', open: true, body: Fb.partCard(r.name) })}
+          <div class="card"><div class="b15">MESSAGGIO DI RICHIESTA</div><div class="b17" style="color:#000">${r.msg ? '«' + esc(r.msg) + '»' : '<span style="color:#7B7B7C">Nessun messaggio</span>'}</div></div>
           ${(r.friends || []).length ? `<div class="card"><div class="b15">VIENE CON</div>${r.friends.map(f => `<div class="rw">${av(f, 36)}<div class="h3" style="font-size:16px">${esc(f)}</div></div>`).join('')}<div class="b13">Accettando, entrano nel gruppo anche loro (${1 + r.friends.length} posti).</div></div>` : ''}
           ${p.blind ? '' : `<div class="card"><div class="b15">COMPATIBILITÀ CON IL GRUPPO</div><div class="tone"><div class="mk" style="left:${comp}%;background:#fff;border:3px solid #123F73"></div></div>
             <div style="display:flex;justify-content:space-between" class="b15"><span>Lontano</span><span>Molto vicino</span></div></div>`}
@@ -294,12 +303,12 @@
         html: `<div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip sm" style="background:#F5F5F7;border:0">${esc(x.when || x.date || '')}</span><span class="pl ${ST[st.status][0]}">${ST[st.status][1]}</span></div>
             <div class="h1n">${esc(x.title)}</div><div class="b15">Organizza ${esc(x.who)} · ${ms} partecipanti</div></div>
           ${pending ? `<div class="card" style="gap:10px"><div class="rw"><div class="ndots"><i></i><i></i><i></i></div><div class="tx"><div class="h3">In attesa di ${esc(x.who)}</div><div class="b15">Ti avvisiamo appena risponde.</div></div></div>
-              <div class="gy"><div class="b15">Il tuo messaggio: «${esc(st.msg)}»</div></div></div>`
+              ${st.msg ? `<div class="gy"><div class="b15">Il tuo messaggio: «${esc(st.msg)}»</div></div>` : ''}</div>`
             : hubRow(['chat'], 'Chat del gruppo', un ? `${un} nuovi messaggi` : 'Scrivi al gruppo', un ? `<span class="pl bl">${un}</span>` : null, `data-go="chat" data-p='{"id":"${x.id}"}'`)}
           ${hubRow(['users'], 'Partecipanti', `${ms} persone`, null, `data-go="participants" data-p='{"id":"${x.id}"}'`)}
           ${hubRow(['pin'], 'Dettagli e luogo', x.place || x.city, null, `data-go="actInfo" data-p='{"id":"${x.id}"}'`)}
           ${pending ? '' : hubRow(['star'], 'Valutazione prima e dopo', !st.pre ? 'Valuta prima di partecipare' : !st.post ? 'Prima fatta · dopo a fine attività' : 'Completata', `<span class="pl ${rates === 2 ? 'ok' : rates ? 'bl' : 'at'}">${rates}/2</span>`,
-            `data-go="${st.pre ? 'finalRate' : 'preRate'}" data-p='{"id":"${x.id}"}'`)}
+            `data-go="${st.pre ? 'hostRate' : 'preRate'}" data-p='{"id":"${x.id}"}'`)}
           ${hubRow(['logout'], pending ? 'Annulla la richiesta' : 'Esci dall\'attività', '', null, 'data-act="leave"')}`
       };
     },

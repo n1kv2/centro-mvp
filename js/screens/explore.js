@@ -118,6 +118,7 @@
     inlSend() { const x = Match.find(App.current.p.id); if (inl) { Rate.save(x, inl); App.refresh(); } }
   };
   const AVC = ['#6FD7E1', '#F5A25D', '#BA7BE0', '#8194FF', '#7BD389', '#F27BA0'];
+  window.Inline = { box: inlineBox, actions: inlineActions };
 
   /* ---------- 6 · Dettaglio attività community ---------- */
   App.screen('actDetail', {

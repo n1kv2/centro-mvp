@@ -69,9 +69,8 @@
     else body = `<textarea class="nbox desc" id="desc">${esc(d.descText)}</textarea>
       <div class="nprompt soft">${spark('#C058F0', 20)}<input id="niaEdit" placeholder="Chiedi una modifica a Nia"><button class="nsend" data-act="editNia" aria-label="Invia a Nia">${ic('chev', { size: 18, color: '#fff', sw: 2.4 })}</button></div>
       <button class="link" data-act="niaReset" style="align-self:flex-start;padding:2px 4px">Riscrivi da capo</button>`;
-    return `<div class="card sec" data-f="desc"><div class="rw"><div class="ico b">${ic('doc', { color: '#489DFE' })}</div><div class="tx"><div class="h3">Descrizione</div><div class="b15">Cosa si fa, cosa portare, note</div></div></div>
-      <div class="nseg"><div class="${nia ? 'on' : ''}" data-act="descMode" data-m="nia"><span>Con Nia</span></div><div class="${nia ? '' : 'on'}" data-act="descMode" data-m="man"><span>A mano</span></div></div>
-      ${body}<span class="ferr">Scrivi una descrizione</span>
+    return `<div style="position:relative;display:flex;flex-direction:column;gap:12px"><div class="nseg"><div class="${nia ? 'on' : ''}" data-act="descMode" data-m="nia"><span>Con Nia</span></div><div class="${nia ? '' : 'on'}" data-act="descMode" data-m="man"><span>A mano</span></div></div>
+      ${body}<span class="ferr" style="display:block;min-height:0"></span>
       <div class="nload" id="nload"><div class="ndots"><i></i><i></i><i></i></div><div class="h3">Nia sta sistemando la descrizione…</div></div></div>`;
   }
   function dateList(d) {
@@ -90,45 +89,51 @@
           <label class="field"><span class="b13" style="padding:0 8px">Fine</span><input class="inp" type="time" id="rEnd" value="${r.end}"></label></div>
         <div class="rw" style="justify-content:space-between;padding:0 4px"><span class="b17" style="color:#000">Per quante settimane</span>
           <div class="rw" style="width:auto;gap:8px"><button class="stp" data-act="weeks" data-d="-1" aria-label="Meno">−</button><b style="min-width:26px;text-align:center">${r.weeks}</b><button class="stp" data-act="weeks" data-d="1" aria-label="Più">+</button></div></div></div>` : '';
-    return `<div class="card sec" data-f="dates"><div class="rw"><div class="ico b">${ic('calendar', { color: '#489DFE' })}</div><div class="tx"><div class="h3">Date</div><div class="b15">Una o più date, oppure una serie che si ripete</div></div></div>
-      <div class="seg"><div class="${rule ? '' : 'on'}" data-act="schedMode" data-m="single">Date singole</div><div class="${rule ? 'on' : ''}" data-act="schedMode" data-m="rule">Ricorrente</div></div>
+    return `<div class="seg"><div class="${rule ? '' : 'on'}" data-act="schedMode" data-m="single">Date singole</div><div class="${rule ? 'on' : ''}" data-act="schedMode" data-m="rule">Ricorrente</div></div>
       ${ruleForm}
       <div id="dateList" style="display:flex;flex-direction:column;gap:10px">${list}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip sm" data-act="addDate">${ic('plus', { size: 16, color: '#4D4D4D' })}${rule ? 'Aggiungi eccezione' : 'Aggiungi data'}</span></div>
-      ${rule ? `<div class="b13">Le date ricorrenti restano una sola attività: chi partecipa si iscrive alla serie.</div>` : ''}
-      <span class="ferr">Aggiungi almeno una data</span></div>`;
+      ${rule ? `<div class="b13">Le date ricorrenti restano una sola attività: chi partecipa si iscrive alla serie.</div>` : ''}`;
   }
   const EX = ['Corsa tranquilla di 6 km nel parco, poi caffè insieme per chi vuole', 'Giochi da tavolo per principianti, porto io Catan e Dixit'];
 
   /* ---------- 1 · Informazioni, descrizione, date ---------- */
+  const TARGETS = ['Tutti', 'Principianti', 'Studenti', 'Lavoratori', 'Nuovi in città', 'Chi viene da solo'];
   App.screen('create', {
     top: 'main',
     render() {
-      const d = D(), all = INTERESTS.concat(d.interest && !INTERESTS.includes(d.interest) ? [d.interest] : []);
+      const d = D(), all = INTERESTS.concat(d.interest && !INTERESTS.includes(d.interest) ? [d.interest] : []), b = buildDates(d.sched);
+      const h = d.coverHue != null ? d.coverHue : d.interest ? actHue(d.interest) : null;
+      const bg = d.photo ? `background-image:url(${d.photo})` : h == null ? '' : `background:linear-gradient(160deg,hsl(${h} 80% 88%),hsl(${h + 12} 75% 74%) 55%,hsl(${h + 24} 70% 62%))`;
       return {
-        html: `${steps(1)}<div class="h1">Crea un'attività</div>
-          <label class="cover-in phi${d.photo ? ' has' : ''}" style="${d.photo ? `background:url(${d.photo}) center/cover` : ''}">
-            ${d.photo ? `<span class="gl" style="height:38px;font-size:15px">${ic('camera', { size: 18 })}Cambia foto</span>` : `${ic('camera', { color: '#6D7C93' })}Aggiungi la foto della card`}
-            <input type="file" accept="image/*" id="coverIn" hidden></label>
-          <label class="field" data-f="title"><input class="inp" id="title" placeholder="Titolo dell'attività" maxlength="48" value="${esc(d.title || '')}"><span class="ferr">Dai un titolo all'attività</span></label>
-          <div class="lab">Interesse</div>
-          <div class="field" data-f="interest"><div style="display:flex;flex-wrap:wrap;gap:8px">${all.map(i => `<span class="chip${d.interest === i ? ' on' : ''}" data-act="interest" data-v="${esc(i)}">${esc(i)}</span>`).join('')}
-            <span class="chip" data-act="addInterest" aria-label="Altro interesse">+</span></div><span class="ferr">Scegli un interesse</span></div>
-          <div class="inp" style="justify-content:space-between">${ic('users', { color: '#7B7B7C' })}<span style="flex:1;color:#7B7B7C">Max persone</span>
-            <button class="stp" data-act="max" data-d="-1" aria-label="Meno">−</button><b style="min-width:26px;text-align:center;color:#000">${d.max}</b><button class="stp" data-act="max" data-d="1" aria-label="Più">+</button></div>
-          <label class="field" data-f="place"><div class="inp">${ic('pin', { color: '#7B7B7C' })}<input id="place" class="bare" placeholder="Luogo" value="${esc(d.place || '')}"></div><span class="ferr">Dove ci si trova?</span></label>
-          ${descSection(d)}
-          ${dateSection(d)}`,
+        hero: `<div class="cover${d.photo ? ' has-img' : ''}" style="${bg}"></div>
+          <div class="cover-tags"><span class="pl">Passo 1 di 4</span></div>
+          <div class="cover-act"><label class="gl">${ic('camera', { size: 18, color: '#C2541B' })}Modifica copertina<input type="file" accept="image/*" id="coverIn" hidden></label>
+            <span class="gl sq" data-act="niaCover" aria-label="Copertina suggerita da Nia">${ic('sparkle', { size: 18, color: '#C2541B' })}</span></div>`,
+        cls: 'cover-on',
+        html: `<div class="title-card" data-f="title"><input class="title-in" id="title" placeholder="Titolo dell'attività" maxlength="48" value="${esc(d.title || '')}" aria-label="Titolo"></div>
+          ${Sec.card({ id: 'cat', icon: 'grid', title: 'Categoria', sub: d.interest || 'Scegli il tema della tua attività', done: !!d.interest, open: !d.interest,
+            body: `<div class="fbtags">${all.map(i => `<span class="chip${d.interest === i ? ' on' : ''}" data-act="interest" data-v="${esc(i)}">${esc(i)}</span>`).join('')}<span class="chip" data-act="addInterest" aria-label="Altro interesse">+</span></div>` })}
+          ${Sec.card({ id: 'dates', icon: 'calendar', title: 'Data e ora', sub: b.count ? `${b.cardWhen}${d.sched.mode === 'rule' ? ` · ${b.count} date` : ''}` : 'Imposta il giorno e gli orari', done: b.count > 0, body: dateSection(d) })}
+          ${Sec.card({ id: 'place', icon: 'pin', title: 'Luogo', sub: d.place || 'Inserisci l\'indirizzo del ritrovo', done: !!(d.place || '').trim(),
+            body: `<input class="inp" id="place" placeholder="Es. Parco Sempione, ingresso nord" value="${esc(d.place || '')}" aria-label="Luogo">
+              <div class="sub">${ic('lock', { color: '#7B7B7C' })}<div class="b15">L'indirizzo esatto lo vedono solo i partecipanti accettati.</div></div>` })}
+          ${Sec.card({ id: 'desc', icon: 'info', title: 'Informazioni', sub: d.descText ? d.descText.split('\n')[0] : 'Descrivi brevemente cosa si farà', done: !!d.descText.trim(), body: descSection(d) })}
+          ${Sec.card({ id: 'seats', icon: 'seat', title: 'Posti disponibili', sub: `${d.max} persone`, done: true,
+            body: `<div class="rw" style="justify-content:space-between"><span class="b17" style="color:#000">Numero massimo di partecipanti</span><div class="rw" style="width:auto;gap:8px">
+              <button class="stp" data-act="max" data-d="-1" aria-label="Meno">−</button><b style="min-width:26px;text-align:center">${d.max}</b><button class="stp" data-act="max" data-d="1" aria-label="Più">+</button></div></div>` })}
+          ${Sec.card({ id: 'target', icon: 'target', title: 'Per chi', sub: d.perChi || 'Il pubblico ideale (facoltativo)', done: !!d.perChi,
+            body: `<div class="fbtags">${TARGETS.map(t => `<span class="chip sm${d.perChi === t ? ' on' : ''}" data-act="perChi" data-v="${t}">${t}</span>`).join('')}</div>` })}`,
         cta: `<div class="btn" data-act="next">Avanti</div>`
       };
     },
     mount(v) {
       const d = D(), bind = (id, fn) => { const e = v.querySelector('#' + id); if (e) e.addEventListener('input', () => fn(e)); return e; };
-      v.querySelector('#coverIn').addEventListener('change', e => readPhoto(e.target.files[0], url => { d.photo = url; save(); App.refresh(); }));
-      bind('title', e => { d.title = e.value; save(); e.closest('.field').classList.remove('bad'); });
-      bind('place', e => { d.place = e.value; save(); e.closest('.field').classList.remove('bad'); });
+      document.getElementById('coverIn').addEventListener('change', e => readPhoto(e.target.files[0], url => { d.photo = url; save(); App.refresh(); }));
+      bind('title', e => { d.title = e.value; save(); e.closest('.title-card').classList.remove('bad'); });
+      bind('place', e => { d.place = e.value; save(); const sx = e.closest('.sx'); sx.classList.remove('bad'); sx.querySelector('.sx-t span').textContent = e.value || 'Inserisci l\'indirizzo del ritrovo'; sx.classList.toggle('done', !!e.value.trim()); });
       bind('niaText', e => { d.text = e.value; save(); document.getElementById('niaGo').classList.toggle('off', !e.value.trim()); });
-      const ds = bind('desc', e => { d.descText = e.value; save(); fit(e); e.closest('.sec').classList.remove('bad'); });
+      const ds = bind('desc', e => { d.descText = e.value; save(); fit(e); e.closest('.sx').classList.remove('bad'); });
       if (ds) fit(ds);
       const ne = v.querySelector('#niaEdit'); if (ne) ne.addEventListener('keydown', e => { if (e.key === 'Enter') App.screens.create.actions.editNia(); });
       const r = d.sched.rule, rupd = () => { save(); document.getElementById('dateList').innerHTML = dateList(d); };
@@ -140,6 +145,8 @@
     },
     actions: {
       interest(el) { D().interest = el.dataset.v; save(); App.refresh(); },
+      perChi(el) { const d = D(); d.perChi = d.perChi === el.dataset.v ? '' : el.dataset.v; save(); App.refresh(); },
+      niaCover() { const d = D(); d.photo = ''; d.coverHue = Math.floor(Math.random() * 360); save(); App.refresh(); App.toast('Nia · nuova copertina proposta'); },
       addInterest() {
         App.sheet(`<div class="h2" style="padding:4px 4px 0">Altro interesse</div><input class="inp" id="newInt" placeholder="Es. Fotografia" maxlength="20"><div class="btn" data-act="saveInt">Aggiungi</div>`);
         setTimeout(() => document.getElementById('newInt').focus(), 320);
@@ -173,9 +180,11 @@
       rmDate(el) { const sc = D().sched, i = +el.dataset.i; (sc.mode === 'rule' ? sc.exc : sc.singles.sort((a, b) => a.d < b.d ? -1 : 1)).splice(i, 1); save(); App.refresh(); },
       next() {
         const d = D(), b = buildDates(d.sched); let ok = true, first = null;
-        [['title', !!(d.title || '').trim()], ['interest', !!d.interest], ['place', !!(d.place || '').trim()], ['desc', !!d.descText.trim()], ['dates', b.count > 0]].forEach(([k, good]) => {
-          const el = document.querySelector(`[data-f="${k}"]`); el.classList.toggle('bad', !good); if (!good) { ok = false; first = first || el; }
+        [['title', !!(d.title || '').trim()], ['cat', !!d.interest], ['dates', b.count > 0], ['place', !!(d.place || '').trim()], ['desc', !!d.descText.trim()]].forEach(([k, good]) => {
+          const el = k === 'title' ? document.querySelector('[data-f="title"]') : document.querySelector(`[data-sx="${k}"]`);
+          el.classList.toggle('bad', !good); if (!good) { ok = false; first = first || el; if (k !== 'title') Sec.open(k); }
         });
+        if (!ok) App.toast('Completa le sezioni evidenziate');
         if (!ok) { App.buzz(30); first.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
         App.go('createOffer');
       }

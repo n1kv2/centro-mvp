@@ -14,23 +14,24 @@
       return {
         html: `<div class="h1">${p.review ? 'Rivedi il video' : 'Benvenuto'}</div>
         <div class="b17" style="padding:0 4px;margin-top:-6px">Guarda il video: ti spiega a cosa serve il test, come si valuta e cosa ottieni.</div>
-        <div class="video phi" id="video" data-act="vtoggle">
-          <div class="vchap" id="vchap">Video di spiegazione · 2–3 min</div>${scenes}
+        <div class="video phi locked" id="video" aria-label="Video non ancora disponibile">
+          <div class="vchap" id="vchap">Video di spiegazione · disponibile a breve</div>${scenes}
           <div class="play" id="vplay">${ic('play', { size: 30, color: '#fff', fill: '#fff' })}</div>
           <div class="vsub" id="vsubt"></div>
           <div class="vbar"><i id="vbar"></i></div>
           <span class="gl vexit" data-act="vfull" aria-label="Esci da schermo intero">${ic('close', { size: 20 })}</span>
         </div>
         <div style="display:flex;gap:8px">
-          <span class="chip sm${vsub ? ' on' : ''}" data-act="vsub" id="cSub">Sottotitoli</span>
-          <span class="chip sm" data-act="vspeed" id="cSpeed">${String(vspeed).replace('.', ',')}×</span>
-          <span class="chip sm" data-act="vfull">${ic('expand', { size: 16, color: '#4D4D4D' })}Schermo intero</span></div>
+          <span class="chip sm off" id="cSub">Sottotitoli</span>
+          <span class="chip sm off" id="cSpeed">1×</span>
+          <span class="chip sm off">${ic('expand', { size: 16, color: '#4D4D4D' })}Schermo intero</span></div>
         <div class="card"><div class="h3">Cosa vedrai nel video</div>
           <div class="b17">1 · Come funziona il feed «Affini»<br>2 · Come si valuta, in modo rapido o approfondito<br>3 · Task, punti e ricompensa finale</div></div>`,
         cta: p.review ? `<div class="btn" data-back>Torna indietro</div>` : `<div class="btn" data-go="register">Continua alla registrazione</div>`
       };
     },
-    mount() { paintVideo(); },
+    /* video bloccato: per ora è solo un segnaposto, non si avvia */
+    mount() { },
     unmount() { vplaying = false; },
     actions: {
       vtoggle() {

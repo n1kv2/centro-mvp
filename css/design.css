@@ -97,3 +97,23 @@
 .mini-card .thumb{width:52px;height:52px}
 .title-card.bad{box-shadow:0 0 0 2px #F55F4F}
 .cover-act label.gl{cursor:pointer}
+/* chip «Demo» sulle locandine di eventi e attività del team (non sono community) */
+.cover-tags .pl.demo{background:#123F73;color:#fff;letter-spacing:.5px}
+/* Crea: «Modifica copertina» e AI staccati dalla card del titolo */
+.cover-act{top:222px}
+/* sezione completata: verde, con spunta sull'icona */
+.sx.done .sx-i{background:#EAF6E2!important;position:relative}
+.sx.done .sx-i svg{stroke:#4F9A26!important}
+.sx.done .sx-i:after{content:"";position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;border-radius:50%;border:2px solid #fff;
+  background:#6ABD3D url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/11px no-repeat}
+.sx.done .sx-t span{color:#4F9A26!important}
+.sx.done .sx-c svg{stroke:#CCD2D9!important}
+.sx.done.open .sx-c svg{stroke:#4F9A26!important}
+.charav{position:relative;overflow:hidden}
+.charav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+/* «A mano» selezionato: blu pieno (il gradiente è solo per Nia) */
+.nseg>div.on[data-m="man"] span{background:none;-webkit-text-fill-color:#489DFE;color:#489DFE}
+/* domande del giorno: una riga di valori nel tempo */
+.dline{display:flex;gap:6px;flex-wrap:wrap}
+.dline i{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px 'DM Sans';color:#fff;font-style:normal}
+.dline i.q{background:#fff;color:#123F73;border:2px solid #123F73;box-sizing:border-box}

@@ -11,7 +11,7 @@
   function cover(x, tags) {
     const h = actHue(x.interest), bg = x.photo ? `background-image:url(${x.photo})` : `background:linear-gradient(160deg,hsl(${h} 80% 88%),hsl(${h + 12} 75% 74%) 55%,hsl(${h + 24} 70% 62%))`;
     return `<div class="cover${x.photo ? ' has-img' : ''}" style="${bg}">${x.photo ? '' : `<span class="cv-i">${esc(x.title[0])}</span>`}</div>
-      <div class="cover-tags">${tags.map(t => `<span class="pl">${esc(t)}</span>`).join('')}</div>`;
+      ${tags.length ? `<div class="cover-tags">${tags.map(t => `<span class="pl demo">${esc(t)}</span>`).join('')}</div>` : ''}`;
   }
   function related(x) {
     const all = Match.feed([x.type]).filter(y => y.id !== x.id);
@@ -53,7 +53,7 @@
       else if (part && part.status !== 'archived') cta = `<div class="bookbar"><div class="btn" data-go="partHub" data-p='{"id":"${x.id}"}'>La tua partecipazione</div><div class="btn s" style="flex:none;width:54px;padding:0" data-go="chat" data-p='{"id":"${x.id}"}' aria-label="Chat">${ic('chat')}</div></div>`;
       else if (!part) cta = `<div class="bookbar"><div class="btn" data-go="joinReq" data-p='{"id":"${x.id}"}'>Chiedi di partecipare</div><span class="price">Gratis</span></div>`;
       return {
-        hero: cover(x, [x.interest, 'Attività community']), cls: 'cover-on',
+        hero: cover(x, []), cls: 'cover-on',
         html: `<div class="title-card"><div class="rw" style="justify-content:space-between"><span class="chip sm">${esc(x.interest)}</span>${actions(x)}</div>
             <div class="h1n" style="font-size:28px;line-height:34px">${esc(x.title)}</div>
             <div class="b15">Organizzato da ${esc(x.mine ? 'te' : x.who)} · #${esc(x.code || '')}</div>
@@ -75,7 +75,7 @@
       const x = Match.find(p.id); if (!x) return 'Contenuto non trovato';
       const lb = Match.label(x.aff), free = /gratis/i.test(x.price || '');
       return {
-        hero: cover(x, [x.cat, x.type === 'evento' ? 'Evento del team' : 'Attività del team']), cls: 'cover-on',
+        hero: cover(x, ['Demo']), cls: 'cover-on',
         html: `<div class="title-card"><div class="rw" style="justify-content:space-between"><span class="chip sm">${esc(x.cat)}</span>${actions(x)}</div>
             <div class="h1n" style="font-size:28px;line-height:34px">${esc(x.title)}</div>
             <div class="b15">${esc(x.who)} · ${esc(x.city)}</div><div class="rw"><span class="pl ${lb[0]}">${lb[1]}</span><span class="pl gr">${esc(x.price)}</span></div></div>

@@ -103,6 +103,8 @@
     top: 'main',
     render() {
       const d = D(), all = INTERESTS.concat(d.interest && !INTERESTS.includes(d.interest) ? [d.interest] : []), b = buildDates(d.sched);
+      if (typeof d.perChi === 'string') d.perChi = d.perChi ? [d.perChi] : [];
+      const pc = d.perChi || [];
       const h = d.coverHue != null ? d.coverHue : d.interest ? actHue(d.interest) : null;
       const bg = d.photo ? `background-image:url(${d.photo})` : h == null ? '' : `background:linear-gradient(160deg,hsl(${h} 80% 88%),hsl(${h + 12} 75% 74%) 55%,hsl(${h + 24} 70% 62%))`;
       return {
@@ -119,11 +121,12 @@
             body: `<input class="inp" id="place" placeholder="Es. Parco Sempione, ingresso nord" value="${esc(d.place || '')}" aria-label="Luogo">
               <div class="sub">${ic('lock', { color: '#7B7B7C' })}<div class="b15">L'indirizzo esatto lo vedono solo i partecipanti accettati.</div></div>` })}
           ${Sec.card({ id: 'desc', icon: 'info', title: 'Informazioni', sub: d.descText ? d.descText.split('\n')[0] : 'Descrivi brevemente cosa si farà', done: !!d.descText.trim(), body: descSection(d) })}
-          ${Sec.card({ id: 'seats', icon: 'seat', title: 'Posti disponibili', sub: `${d.max} persone`, done: true,
+          ${Sec.card({ id: 'seats', icon: 'seat', title: 'Posti disponibili', sub: `${d.max} persone`, done: !!d.maxTouched,
             body: `<div class="rw" style="justify-content:space-between"><span class="b17" style="color:#000">Numero massimo di partecipanti</span><div class="rw" style="width:auto;gap:8px">
               <button class="stp" data-act="max" data-d="-1" aria-label="Meno">−</button><b style="min-width:26px;text-align:center">${d.max}</b><button class="stp" data-act="max" data-d="1" aria-label="Più">+</button></div></div>` })}
-          ${Sec.card({ id: 'target', icon: 'target', title: 'Per chi', sub: d.perChi || 'Il pubblico ideale (facoltativo)', done: !!d.perChi,
-            body: `<div class="fbtags">${TARGETS.map(t => `<span class="chip sm${d.perChi === t ? ' on' : ''}" data-act="perChi" data-v="${t}">${t}</span>`).join('')}</div>` })}`,
+          ${Sec.card({ id: 'target', icon: 'target', title: 'Per chi', sub: pc.length ? pc.join(' · ') : 'Il pubblico ideale · fino a 3 (facoltativo)', done: pc.length > 0,
+            body: `<div class="b13" style="display:flex;justify-content:space-between"><span>Scegli fino a 3</span><span>${pc.length} / 3</span></div>
+              <div class="fbtags">${TARGETS.map(t => `<span class="chip sm${pc.includes(t) ? ' on' : ''}" data-act="perChi" data-v="${t}">${t}</span>`).join('')}</div>` })}`,
         cta: `<div class="btn" data-act="next">Avanti</div>`
       };
     },
@@ -145,14 +148,18 @@
     },
     actions: {
       interest(el) { D().interest = el.dataset.v; save(); App.refresh(); },
-      perChi(el) { const d = D(); d.perChi = d.perChi === el.dataset.v ? '' : el.dataset.v; save(); App.refresh(); },
+      perChi(el) {
+        const d = D(), v = el.dataset.v, l = d.perChi = Array.isArray(d.perChi) ? d.perChi : [], i = l.indexOf(v);
+        if (i >= 0) l.splice(i, 1); else if (l.length >= 3) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); App.buzz([20, 40, 20]); return App.toast('Al massimo 3 scelte'); } else l.push(v);
+        save(); App.refresh();
+      },
       niaCover() { const d = D(); d.photo = ''; d.coverHue = Math.floor(Math.random() * 360); save(); App.refresh(); App.toast('Nia · nuova copertina proposta'); },
       addInterest() {
         App.sheet(`<div class="h2" style="padding:4px 4px 0">Altro interesse</div><input class="inp" id="newInt" placeholder="Es. Fotografia" maxlength="20"><div class="btn" data-act="saveInt">Aggiungi</div>`);
         setTimeout(() => document.getElementById('newInt').focus(), 320);
       },
       saveInt() { const v = document.getElementById('newInt').value.trim(); if (v) { D().interest = v.charAt(0).toUpperCase() + v.slice(1); save(); } App.closeOv(); App.refresh(); },
-      max(el) { const d = D(); d.max = Math.max(2, Math.min(30, d.max + +el.dataset.d)); save(); App.refresh(); },
+      max(el) { const d = D(); d.max = Math.max(2, Math.min(30, d.max + +el.dataset.d)); d.maxTouched = true; save(); App.refresh(); },
       /* descrizione */
       descMode(el) { D().descMode = el.dataset.m; save(); App.refresh(); },
       ex(el) { D().text = EX[+el.dataset.i]; save(); App.refresh(); },
@@ -321,7 +328,7 @@
       publish() {
         const d = D(), id = 'u' + Date.now().toString(36);
         const b = buildDates(d.sched);
-        const act = Object.assign({}, d, { id, who: S().user.nome || 'Tu', code: S().code.replace('NIA-', ''), mine: true, when: b.cardWhen, dates: b.dates, count: b.count, desc: d.descText, createdAt: Date.now(), joined: 1, requests: [],
+        const act = Object.assign({}, d, { perChi: Array.isArray(d.perChi) ? d.perChi.join(' · ') : d.perChi, id, who: S().user.nome || 'Tu', code: S().code.replace('NIA-', ''), mine: true, when: b.cardWhen, dates: b.dates, count: b.count, desc: d.descText, createdAt: Date.now(), joined: 1, requests: [],
           climates: d.climates.concat(d.climateOther.trim() ? [d.climateOther.trim()] : []) });
         ['nia', 'text', 'descMode', 'climateOther', 'climateOpen', 'descText'].forEach(k => delete act[k]);
         S().myActs = (S().myActs || []).concat([{ id, role: 'org', status: 'Attiva' }]);

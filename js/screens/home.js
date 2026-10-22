@@ -8,10 +8,12 @@
 
   App.screen('home', {
     top: 'main', nav: true, tab: 'home',
+    mount() { if (window.Daily) App.later(() => Daily.prompt(), 500); },
     render() {
       return `<div class="h1">${greet()}, ${App.esc(S().user.nome || 'ospite')}.</div>
         <div class="b17" style="padding:0 4px;margin-top:-6px">Cosa vuoi fare oggi?</div>
         <div style="height:12px;flex:none"></div>
+        ${window.Daily ? Daily.card() : ''}
         ${actCard('create', '#F06139,#D43998', 'plus', 'Crea', 'Un\'attività community reale')}
         ${actCard('match', '#BB2DCE,#471EBA', 'house', 'Match', 'La mia casa e i coinquilini')}
         ${actCard('explore', '#489DFE,#1E42BA', 'search', 'Esplora', 'Community, eventi, attività, bacheca')}`;

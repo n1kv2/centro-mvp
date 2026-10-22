@@ -8,7 +8,7 @@
       const open = o.staticOpen || isOpen(o.id, o.open);
       return `<div class="sx${open ? ' open' : ''}${o.done ? ' done' : ''}${o.off ? ' off' : ''}${o.staticOpen ? ' static' : ''}${o.cls ? ' ' + o.cls : ''}" data-sx="${o.id}">
         <div class="sx-h" ${o.staticOpen || o.off ? '' : `data-act="sx" role="button" aria-expanded="${open}"`}>
-          <div class="sx-i">${ic(o.icon || 'doc', { color: open || o.done ? '#489DFE' : '#000' })}</div>
+          <div class="sx-i">${ic(o.icon || 'doc', { color: o.done ? '#4F9A26' : open ? '#489DFE' : '#000' })}</div>
           <div class="sx-t"><b>${o.title}</b>${o.sub ? `<span>${o.sub}</span>` : ''}</div>
           ${o.staticOpen ? (o.right || '') : `<span class="sx-c">${ic('down', { size: 18, color: open ? '#489DFE' : '#CCD2D9', sw: 2.2 })}</span>`}</div>
         <div class="sx-b"><div class="sx-in">${o.body || ''}</div></div></div>`;

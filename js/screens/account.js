@@ -123,10 +123,11 @@
       }
       return `<div class="h1">Statistiche</div>
         <div class="card"><div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-          <div class="charav">${ic('user', { size: 54, color: '#fff', sw: 1.4 })}</div>
+          <div class="charav">${ic('user', { size: 54, color: '#fff', sw: 1.4 })}<img src="assets/characters/${ch.slug}.png" alt="" onerror="this.remove()"></div>
           <div class="h1n" style="font-size:26px;text-align:center">${ch.name}</div><div class="b15" style="text-align:center">${ch.d}</div>
           ${chQ.name !== ch.name ? `<span class="pl gr">Dal questionario: ${chQ.name}</span>` : ''}</div></div>
         ${evoCard(ev)}
+        ${window.Daily ? Daily.statsCard() : ''}
         <div class="seg"><div class="${seg === 'val' ? 'on' : ''}" data-act="seg" data-s="val">Valutazioni</div><div class="${seg === 'q' ? 'on' : ''}" data-act="seg" data-s="q">Questionario</div></div>
         ${body}`;
     },

@@ -10,6 +10,7 @@
     { t: '1e · Esplora', items: [['explore', '1 · Scelta contenuti'], ['feed', '2 · Feed Affini'], ['rateDeep', '4 · Valutazione approfondita', { id: 'c1' }], ['feed', '5 · Feed «Tutti»', { seg: 'all' }], ['actDetail', '6 · Dettaglio community', { id: 'c1' }], ['poster', '7 · Locandina evento', { id: 'e1' }], ['board', '8 · Bacheca']] },
     { t: '1f · Organizzatore', items: [['myActs', 'Le mie attività · Organizzo', { seg: 'org' }]] },
     { t: '1g · Partecipante', items: [['joinReq', '1 · Richiesta di partecipazione', { id: 'c4' }], ['myActs', '2 · Le mie attività'], ['partHub', '3 · Attività a cui partecipo', { id: 'c3' }], ['chat', '4 · Chat di gruppo', { id: 'c3' }], ['preRate', '5 · Valutazione prima', { id: 'c3' }], ['hostRate', '6 · Valutazione finale e feedback host', { id: 'c3' }], ['report', 'Segnalazione al team', { id: 'c3', who: 'Chiara', role: 'organizzatore' }], ['fbThanks', 'Grazie per il feedback', { name: 'Chiara' }]] },
+    { t: 'Domande del giorno', items: [['daily', '1 · Domanda del giorno', { k: 0 }], ['dailyDone', '2 · Fatto per oggi']] },
     { t: '1h · Notifiche', items: [['notifs', '1 · Centro notifiche'], ['mail', '2 · Email giornaliera']] }
   ]);
 })();

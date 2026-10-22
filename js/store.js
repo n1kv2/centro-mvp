@@ -75,11 +75,12 @@
     /* tr facoltativo: { soc, plan, cur } 0–100 (profilo di oggi); senza, usa il questionario */
     character(tr) {
       const p = this.profile(), t = tr ? [{ v: tr.soc }, { v: tr.plan }, { v: tr.cur }] : p.traits;
-      if (t[0].v >= 55 && t[2].v >= 55) return { name: 'L\'Esploratore Sociale', d: 'Curiosità e voglia di persone nuove' };
-      if (t[0].v >= 55) return { name: 'Il Cuore della Festa', d: 'Stai bene in mezzo agli altri' };
-      if (t[2].v >= 55) return { name: 'Il Curioso Tranquillo', d: 'Scopri il mondo con i tuoi tempi' };
-      if (t[1].v >= 55) return { name: 'L\'Architetto', d: 'Ami i piani chiari e le cose fatte bene' };
-      return { name: 'Lo Spirito Libero', d: 'Segui l\'ispirazione del momento' };
+      /* immagine: assets/characters/<slug>.png (se manca si vede l'icona) */
+      if (t[0].v >= 55 && t[2].v >= 55) return { slug: 'esploratore-sociale', name: 'L\'Esploratore Sociale', d: 'Curiosità e voglia di persone nuove' };
+      if (t[0].v >= 55) return { slug: 'cuore-della-festa', name: 'Il Cuore della Festa', d: 'Stai bene in mezzo agli altri' };
+      if (t[2].v >= 55) return { slug: 'curioso-tranquillo', name: 'Il Curioso Tranquillo', d: 'Scopri il mondo con i tuoi tempi' };
+      if (t[1].v >= 55) return { slug: 'architetto', name: 'L\'Architetto', d: 'Ami i piani chiari e le cose fatte bene' };
+      return { slug: 'spirito-libero', name: 'Lo Spirito Libero', d: 'Segui l\'ispirazione del momento' };
     },
     /* Qualità delle risposte: tempo medio e varietà (versione semplificata di score.js) */
     quality() {

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>CEnTRO · Portale admin</title>
+<link rel="icon" href="../assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="../css/fonts.css?v=2">
+<link rel="stylesheet" href="css/admin.css?v=2">
+<script>/* tema prima del primo disegno, per non lampeggiare */
+try { const t = (JSON.parse(localStorage.getItem('centro_admin_v1')) || {}).theme; if (t && t !== 'system') document.documentElement.dataset.theme = t; } catch (e) { }</script>
+</head>
+<body>
+<div id="mobileBlock" class="mobile-block">
+  <img src="../assets/icon.svg?v=2" alt="" width="64" height="64">
+  <h1>Portale admin</h1>
+  <p>Il portale per analizzare i dati del test si usa da computer. Aprilo da un browser desktop, con una finestra larga almeno 1000 px.</p>
+  <a href="../">Torna al prototipo</a>
+</div>
+<div id="root"></div>
+<div id="tip" class="tip" role="tooltip"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="../js/data.js?v=37"></script>
+<script src="js/store.js?v=2"></script>
+<script src="js/sim.js?v=2"></script>
+<script src="js/stats.js?v=2"></script>
+<script src="js/charts.js?v=2"></script>
+<script src="js/ui.js?v=3"></script>
+<script src="js/pages/dashboard.js?v=2"></script>
+<script src="js/pages/people.js?v=2"></script>
+<script src="js/pages/analysis.js?v=2"></script>
+<script src="js/pages/manage.js?v=2"></script>
+<script src="js/app.js?v=2"></script>
+</body>
+</html>

@@ -75,7 +75,7 @@
       const x = Match.find(p.id); if (!x) return 'Contenuto non trovato';
       const lb = Match.label(x.aff), free = /gratis/i.test(x.price || '');
       return {
-        hero: cover(x, ['Demo']), cls: 'cover-on',
+        hero: cover(x, [x.spot ? 'Spot' : 'Demo']), cls: 'cover-on',
         html: `<div class="title-card"><div class="rw" style="justify-content:space-between"><span class="chip sm">${esc(x.cat)}</span>${actions(x)}</div>
             <div class="h1n" style="font-size:28px;line-height:34px">${esc(x.title)}</div>
             <div class="b15">${esc(x.who)} · ${esc(x.city)}</div><div class="rw"><span class="pl ${lb[0]}">${lb[1]}</span><span class="pl gr">${esc(x.price)}</span></div></div>

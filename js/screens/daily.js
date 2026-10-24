@@ -4,7 +4,7 @@
    Rotazione bilanciata: ordine fisso per persona (seme = codice), ogni giorno le N successive → in 10 giorni ogni item torna ~3 volte. */
 (function () {
   const S = () => Store.s, esc = App.esc, save = () => Store.save();
-  const CFG = { perDay: 3, days: 10, pts: 5 };
+  const CFG = Object.assign({ perDay: 3, days: 10, pts: 5 }, DATA.daily);
   DATA.daily = CFG;
 
   const pad = n => String(n).padStart(2, '0');

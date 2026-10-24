@@ -302,7 +302,7 @@
   /* ---------- 1h · Centro notifiche ---------- */
   const NGO = { accept: ['myActs', 'Apri attività'], request: ['myActs', 'Vedi richiesta'], rate: ['myActs', 'Valuta ora'], mail: ['mail', 'Leggi email'], tasks: ['tasks', 'Vai ai task'] };
   /* raggruppate per giorno e per area; le aree con più notifiche sono impilate e si aprono al tocco */
-  const AREA = { accept: ['Attività', 'calendar'], request: ['Attività', 'calendar'], chat: ['Attività', 'chat'], tasks: ['Task e punti', 'trophy'], mail: ['Email giornaliera', 'mail'], rate: ['Valutazioni', 'star'] };
+  const AREA = { accept: ['Attività', 'calendar'], request: ['Attività', 'calendar'], chat: ['Attività', 'chat'], tasks: ['Task e punti', 'trophy'], mail: ['Email giornaliera', 'mail'], rate: ['Valutazioni', 'star'], staff: ['Staff CEnTRO', 'bell'] };
   const areaOf = n => AREA[n.kind] || ['Avvisi', 'bell'];
   const tsOf = n => {
     if (n.ts) return n.ts;
@@ -344,6 +344,7 @@
         e.stopPropagation();
         const n = S().notifs.find(x => x.id === el.dataset.id); if (!n) return;
         n.read = true; Store.save();
+        if (n.kind === 'staff') return App.pop(`<div class="b13">STAFF CENTRO</div><div class="h2">${esc(n.t)}</div><div class="b17">${esc(n.s)}</div><div class="btn" data-act="closeOv">Ho capito</div>`);
         if (n.ref) return App.go(el.dataset.to === 'chat' || n.kind === 'chat' ? 'chat' : 'partHub', { id: n.ref });
         App.go(el.dataset.to || (NGO[n.kind] || ['tasks'])[0], el.dataset.to === 'chat' ? { id: 'c3' } : {});
       },
